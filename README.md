@@ -17,29 +17,104 @@ yarn install
 This project as a full test suite implementing all validation described in the probject&rsquo; rubric. To run it:
 
 ```
-yarn test --coverage
+yarn test
 ```
 
-## Manual inspection
+## Running
 
-You are free to mess around with the `index.js` file.
-
-As it is, you can check the funcionality by running:
+Before running the web server, you need to create a `.env` file in the root of the project.
 
 ```
-yarn clean
+cp sample.env .env
+```
+
+Set the desired values for the environment variables in the `.env` file:
+
+```bash
+PORT=8000
+BLOCKCHAIN_DATA_STORAGE_DIRECTORY=./chaindata
+```
+
+Now you can start the server:
+
+```bash
 yarn start
 ```
 
-This will: 
+## Endpoints
 
-1. Remove the `./chaindata` directory 
-2. Recreate the blockchain with 200 blocks.
-    - The chain should be valid: `blockchain.validateChain() === true`
-3. Introduce invalid blocks at heights `4`, `7` and `20`.
-    - Now the chain will be invalidated: `blockchain.validateChain() === false`
+<table style="table-layout: fixed; width: 100%;">
+  <thead>
+    <tr>
+      <td>Path</td>
+      <td>Response Code</td>
+      <td>Response Body</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan=2><code>GET /block/:height</code></td>
+      <td><code>200</code>: when block exists for <code>height</code></td>
+      <td>
+      <pre>
+{
+  height: Number,
+  time: ISODate,
+  body: Any,
+  hash: String,
+  previousBlockHash: String,
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>400</code>: when block does not exist for <code>height</code></td>
+      <td>
+      <pre>
+{
+  error: {
+    message: String,
+    cause?: {
+      message: String,
+    } 
+  }
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan=2><code>POST /block</code></td>
+      <td><code>200</code>: when body <code>.body</code> is valid</td>
+      <td>
+      <pre>
+{
+  height: Number,
+  time: ISODate,
+  body: Any,
+  hash: String,
+  previousBlockHash: String,
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>400</code>: when body <code>.body</code> is invalid</td>
+      <td>
+      <pre>
+{
+  error: {
+    message: String,
+    cause?: {
+      message: String,
+    } 
+  }
+}
+      </pre>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Remarks
 
-- There are no classes in this project. All objects are created using proper factory functions.
-- This project uses LevelDB promise API instead of callbacks.
+- This project uses Express.js
