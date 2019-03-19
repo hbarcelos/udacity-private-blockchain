@@ -31,7 +31,7 @@ describe('Blockchain', () => {
 
   describe('.syncGenesisBlock()', () => {
     it('should store height and genesis block into storage when it is emtpy', async () => {
-      storage.get.mockResolvedValueOnce(undefined);
+      storage.get.mockRejectedValueOnce(new Error('dummy'));
 
       await instance.syncGenesisBlock();
 
@@ -131,6 +131,15 @@ describe('Blockchain', () => {
       const result = await instance.getBlock(height);
 
       expect(result).toEqual(block);
+    });
+
+    it('should throw when storage rejects', async () => {
+      const height = 8172381;
+      const error = new Error('not found');
+
+      storage.get.mockRejectedValue(error);
+
+      expect(instance.getBlock(height)).rejects.toThrow();
     });
   });
 

@@ -15,15 +15,24 @@ function hasValidHash({ block }) {
   }
 }
 
+function hasValidBody({ block }) {
+  if (block.body === undefined || block.body === null) {
+    throw new Error(
+      `The provided block body: "${JSON.stringify(block.body)}" is not valid`
+    );
+  }
+}
+
 function extendsChain({ previousBlock, block }) {
   if (previousBlock.hash !== block.previousBlockHash) {
     throw new Error('The provided block does not extend the current chain');
   }
 }
 
-function validateBlock({ previousBlock, block }) {
+function validateBlock({ previousBlock = {}, block = {} } = {}) {
   hasValidHeight({ previousBlock, block });
   hasValidHash({ previousBlock, block });
+  hasValidBody({ previousBlock, block });
   extendsChain({ previousBlock, block });
 }
 

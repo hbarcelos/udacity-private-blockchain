@@ -8,8 +8,17 @@ function createSetBlockHeight({ storage }) {
 
 function createGetBlockHeight({ storage }) {
   return async () => {
-    const heightFromStorage = await storage.get('currentHeight');
-    return heightFromStorage || 0;
+    try {
+      return await storage.get('currentHeight');
+    } catch (err) {
+      if (err.code === 'NotFoundError') {
+        return 0;
+      }
+
+      throw Object.assign(new Error('Problem getting current block height'), {
+        cause: err,
+      });
+    }
   };
 }
 
@@ -19,14 +28,22 @@ function createGetBlock({ storage }) {
       return this.genesisBlock;
     }
 
-    return storage.get(height);
+    try {
+      return await storage.get(height);
+    } catch (err) {
+      throw Object.assign(
+        new Error(`Block at height ${height} does not exist`),
+        { cause: err }
+      );
+    }
   };
 }
 
 function createSyncGenesisBlock({ storage, genesisBlock, setBlockHeight }) {
   return async () => {
-    const currentHeight = await storage.get('currentHeight');
-    if (currentHeight === undefined) {
+    try {
+      await storage.get('currentHeight');
+    } catch (err) {
       await Promise.all([setBlockHeight(0), storage.add(0, genesisBlock)]);
     }
   };

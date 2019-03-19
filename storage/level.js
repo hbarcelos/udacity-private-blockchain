@@ -1,7 +1,7 @@
 const level = require('level');
 
-const chainDB = './chaindata';
-const db = level(chainDB);
+const { BLOCKCHAIN_DATA_STORAGE_DIRECTORY = './chaindata' } = process.env;
+const db = level(BLOCKCHAIN_DATA_STORAGE_DIRECTORY);
 
 async function add(key, data) {
   return db.put(key, JSON.stringify(data));
@@ -12,8 +12,8 @@ async function get(key) {
     const data = await db.get(key);
     return JSON.parse(data);
   } catch (err) {
-    if (err.type === 'NotFoundError') {
-      return undefined;
+    if (err.type) {
+      err.code = err.type;
     }
 
     throw err;
