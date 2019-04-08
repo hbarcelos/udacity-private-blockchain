@@ -1,31 +1,45 @@
 const Block = require('./block');
+const errorCodes = require('./error-codes');
 
 function hasValidHeight({ previousBlock, block }) {
   const expectedHeight = previousBlock.height + 1;
   if (block.height !== expectedHeight) {
-    throw new Error(
-      `Invalid block height. Expected ${expectedHeight}, given ${block.height}`
+    throw Object.assign(
+      new Error(
+        `Invalid block height. Expected ${expectedHeight}, given ${
+          block.height
+        }`
+      ),
+      { code: errorCodes.INVALID_BLOCK_HEIGHT }
     );
   }
 }
 
 function hasValidHash({ block }) {
   if (block.hash !== Block(block).hash) {
-    throw new Error('The provided block hash is not valid');
+    throw Object.assign(new Error('The provided block hash is not valid'), {
+      code: errorCodes.INVALID_BLOCK_HASH,
+    });
   }
 }
 
 function hasValidBody({ block }) {
   if (block.body === undefined || block.body === null) {
-    throw new Error(
-      `The provided block body: "${JSON.stringify(block.body)}" is not valid`
+    throw Object.assign(
+      new Error(
+        `The provided block body: "${JSON.stringify(block.body)}" is not valid`
+      ),
+      { code: errorCodes.MISSING_BLOCK_BODY }
     );
   }
 }
 
 function extendsChain({ previousBlock, block }) {
   if (previousBlock.hash !== block.previousBlockHash) {
-    throw new Error('The provided block does not extend the current chain');
+    throw Object.assign(
+      new Error('The provided block does not extend the current chain'),
+      { code: errorCodes.INVALID_CHAIN }
+    );
   }
 }
 

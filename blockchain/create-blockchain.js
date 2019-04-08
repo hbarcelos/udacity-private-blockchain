@@ -1,4 +1,5 @@
 const validateBlockImpl = require('./validate-block');
+const { BLOCK_NOT_FOUND, UNKNOWN } = require('./error-codes');
 
 function createSetBlockHeight({ storage }) {
   return async height => {
@@ -16,6 +17,7 @@ function createGetBlockHeight({ storage }) {
       }
 
       throw Object.assign(new Error('Problem getting current block height'), {
+        code: UNKNOWN,
         cause: err,
       });
     }
@@ -33,10 +35,30 @@ function createGetBlock({ storage }) {
     } catch (err) {
       throw Object.assign(
         new Error(`Block at height ${height} does not exist`),
-        { cause: err }
+        {
+          code: BLOCK_NOT_FOUND,
+          cause: err,
+        }
       );
     }
   };
+}
+
+async function findBlockByHash(hash, height = 0) {
+  const chainHeight = await this.getBlockHeight();
+  if (height > chainHeight) {
+    throw Object.assign(new Error(`Block with hash ${hash} does not exist`), {
+      code: BLOCK_NOT_FOUND,
+    });
+  }
+
+  const block = await this.getBlock(height);
+
+  if (block.hash === hash) {
+    return block;
+  }
+
+  return this.findBlockByHash(hash, height + 1);
 }
 
 function createSyncGenesisBlock({ storage, genesisBlock, setBlockHeight }) {
@@ -106,6 +128,7 @@ function createBlockchain({ storage, genesisBlock }) {
     addBlock,
     getBlockHeight,
     getBlock,
+    findBlockByHash,
     validateBlock,
     validateChain,
     get genesisBlock() {

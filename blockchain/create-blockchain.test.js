@@ -167,7 +167,7 @@ describe('Blockchain', () => {
         body: 'dummy',
         time: new Date(),
         previousBlockHash: 'dummy',
-        hash: 'invalid',
+        hash: 'invalidfoo',
       };
 
       storage.get.mockResolvedValue(block);
@@ -224,6 +224,64 @@ describe('Blockchain', () => {
       const result = await instance.validateChain();
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('.findBlockByHash()', () => {
+    it('should return the genesis block if the hash matches', async () => {
+      const result = await instance.findBlockByHash(instance.genesisBlock.hash);
+
+      expect(result).toEqual(instance.genesisBlock);
+    });
+
+    it('should return a block matching the hash further down the chain', async () => {
+      const block1 = Block({
+        height: 1,
+        body: 'dummy',
+        time: new Date(),
+        previousBlockHash: genesisBlock.hash,
+      });
+      const block2 = Block({
+        height: 2,
+        body: 'dummy',
+        time: new Date(),
+        previousBlockHash: block1.hash,
+      });
+
+      instance.getBlock = jest.fn();
+
+      instance.getBlock.mockResolvedValueOnce(genesisBlock);
+      instance.getBlock.mockResolvedValueOnce(block1);
+      instance.getBlock.mockResolvedValueOnce(block2);
+
+      const result = await instance.findBlockByHash(block2.hash);
+
+      expect(result).toEqual(block2);
+    });
+
+    it('should throw when cannot find a block with a given hash', async () => {
+      const block1 = Block({
+        height: 1,
+        body: 'dummy',
+        time: new Date(),
+        previousBlockHash: genesisBlock.hash,
+      });
+      const block2 = Block({
+        height: 2,
+        body: 'dummy',
+        time: new Date(),
+        previousBlockHash: block1.hash,
+      });
+
+      instance.getBlock = jest.fn();
+
+      instance.getBlock.mockResolvedValueOnce(genesisBlock);
+      instance.getBlock.mockResolvedValueOnce(block1);
+      instance.getBlock.mockResolvedValueOnce(block2);
+
+      await expect(
+        instance.findBlockByHash('unexistent hash')
+      ).rejects.toThrow();
     });
   });
 });
