@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { addRequestValidation, validateRequestByWallet } = require('../mempool');
-const { toUnixTimestamp, toDuration, plus } = require('../mempool/date-utils');
+const { toUnixTimestamp, toDuration, plus } = require('../utils/date');
 const ValidationRequest = require('../mempool/validation-request');
 const wrapError = require('./wrap-error');
 

@@ -45,20 +45,42 @@ function createGetBlock({ storage }) {
 }
 
 async function findBlockByHash(hash, height = 0) {
-  const chainHeight = await this.getBlockHeight();
-  if (height > chainHeight) {
-    throw Object.assign(new Error(`Block with hash ${hash} does not exist`), {
-      code: BLOCK_NOT_FOUND,
-    });
+  try {
+    const block = await this.getBlock(height);
+
+    if (block.hash === hash) {
+      return block;
+    }
+
+    return this.findBlockByHash(hash, height + 1);
+  } catch (err) {
+    if (err.code !== BLOCK_NOT_FOUND) {
+      throw err;
+    }
+
+    throw Object.assign(
+      new Error(`Could not find block with hash "${hash}".`),
+      {
+        code: BLOCK_NOT_FOUND,
+      }
+    );
   }
+}
 
-  const block = await this.getBlock(height);
+async function findBlocks(condition, height = 0, acc = []) {
+  try {
+    const block = await this.getBlock(height);
 
-  if (block.hash === hash) {
-    return block;
+    return condition(block)
+      ? this.findBlocks(condition, height + 1, acc.concat(block))
+      : this.findBlocks(condition, height + 1, acc);
+  } catch (err) {
+    if (err.code !== BLOCK_NOT_FOUND) {
+      throw err;
+    }
+
+    return acc;
   }
-
-  return this.findBlockByHash(hash, height + 1);
 }
 
 function createSyncGenesisBlock({ storage, genesisBlock, setBlockHeight }) {
@@ -129,6 +151,7 @@ function createBlockchain({ storage, genesisBlock }) {
     getBlockHeight,
     getBlock,
     findBlockByHash,
+    findBlocks,
     validateBlock,
     validateChain,
     get genesisBlock() {

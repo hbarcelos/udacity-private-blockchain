@@ -1,3 +1,5 @@
+const { toUnixTimestamp } = require('../utils/date');
+
 function encodeStory({
   body: { star: { story, ...starRest } = {}, ...bodyRest },
   ...rest
@@ -20,10 +22,12 @@ function encodeStory({
   };
 }
 
-function withDecodedStory({
-  body: { star: { story, ...starRest } = {}, ...bodyRest },
-  ...rest
-}) {
+function withDecodedStory({ body, ...rest }) {
+  if (Object(body) !== body) {
+    return { ...rest, body };
+  }
+
+  const { star: { story, ...starRest } = {}, ...bodyRest } = body;
   const starMixin = story
     ? {
         star: {
@@ -43,7 +47,14 @@ function withDecodedStory({
   };
 }
 
+const toOutputBlock = ({ time, ...rest }) => ({
+  ...withDecodedStory(rest),
+  time: String(toUnixTimestamp(new Date(time))),
+});
+
+const toInputBlock = block => encodeStory(block);
+
 module.exports = {
-  encodeStory,
-  withDecodedStory,
+  toInputBlock,
+  toOutputBlock,
 };

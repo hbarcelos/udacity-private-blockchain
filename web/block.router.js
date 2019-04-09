@@ -1,17 +1,20 @@
 const { Router } = require('express');
 const { blockchain, Block } = require('../blockchain');
 const verifyStarRegistration = require('./verify-start-registration.middleware');
-const { encodeStory, withDecodedStory } = require('./transformations');
+const { toInputBlock, toOutputBlock } = require('./transformations');
+const wrapError = require('./wrap-error');
 
 module.exports = Router()
-  .post('/block', verifyStarRegistration, async (req, res, next) => {
-    try {
-      const height = blockchain.getBlockHeight();
+  .post(
+    '/block',
+    verifyStarRegistration,
+    wrapError(async (req, res) => {
+      const height = await blockchain.getBlockHeight();
       const previousBlock = await blockchain.getBlock(height);
 
       const { body } = req;
       const newBlock = Block(
-        encodeStory({
+        toInputBlock({
           body,
           time: new Date(),
           height: height + 1,
@@ -20,19 +23,15 @@ module.exports = Router()
       );
 
       await blockchain.addBlock(newBlock);
-      return res.json(withDecodedStory(newBlock));
-    } catch (err) {
-      return next(err);
-    }
-  })
+      return res.json(toOutputBlock(newBlock));
+    })
+  )
+  .get(
+    '/block/:height',
+    wrapError(async (req, res) => {
+      const height = Number(req.params.height);
 
-  .get('/block/:height', async (req, res, next) => {
-    const height = Number(req.params.height);
-
-    try {
       const block = await blockchain.getBlock(height);
-      return res.json(withDecodedStory(block));
-    } catch (err) {
-      return next(err);
-    }
-  });
+      return res.json(toOutputBlock(block));
+    })
+  );

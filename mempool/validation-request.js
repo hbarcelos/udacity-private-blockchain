@@ -1,4 +1,4 @@
-const { toUnixTimestamp } = require('./date-utils');
+const { toUnixTimestamp } = require('../utils/date');
 
 function ValidationRequest({ address, createdAt, expiresAt }) {
   return Object.freeze({
