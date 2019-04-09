@@ -33,6 +33,8 @@ Set the desired values for the environment variables in the `.env` file:
 ```bash
 PORT=8000
 BLOCKCHAIN_DATA_STORAGE_DIRECTORY=./chaindata
+VALIDATION_REQUEST_WINDOW=300
+VALIDATION_EXPIRATION=1800
 ```
 
 Now you can start the server:
@@ -53,13 +55,13 @@ yarn start
   </thead>
   <tbody>
     <tr>
-      <td rowspan=2><code>GET /block/:height</code></td>
+      <td rowspan=2><code>GET /block/{height}</code></td>
       <td><code>200</code>: when block exists for <code>height</code></td>
       <td>
       <pre>
 {
   height: Number,
-  time: ISODate,
+  time: UnixTimestamp,
   body: Any,
   hash: String,
   previousBlockHash: String,
@@ -68,12 +70,13 @@ yarn start
       </td>
     </tr>
     <tr>
-      <td><code>400</code>: when block does not exist for <code>height</code></td>
+      <td><code>404</code>: when block does not exist for <code>height</code></td>
       <td>
       <pre>
 {
   error: {
     message: String,
+    code: String,
     cause?: {
       message: String,
     } 
@@ -89,7 +92,7 @@ yarn start
       <pre>
 {
   height: Number,
-  time: ISODate,
+  time: UnixTimestamp,
   body: Any,
   hash: String,
   previousBlockHash: String,
@@ -98,17 +101,115 @@ yarn start
       </td>
     </tr>
     <tr>
-      <td><code>400</code>: when body <code>.body</code> is invalid</td>
+      <td><code>422</code>: when body <code>.body</code> is invalid</td>
       <td>
       <pre>
 {
   error: {
     message: String,
+    code: String,
     cause?: {
       message: String,
     } 
   }
 }
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>POST /requestValidation</code></td>
+      <td><code>200</code></td>
+      <td>
+      <pre>
+{
+  walletAddress: String,
+  requestTimeStamp: UnixTimestamp,
+  "message": String,
+  "validationWindow": Number,
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan=3><code>POST /message-signature/validate</code></td>
+      <td><code>200</code>: when <code>signature</code> is valid for the <code>address</code></td>
+      <td>
+      <pre>
+{
+  "registerStar": true,
+  "status": {
+    "address": String,
+    "requestTimeStamp": UnixTimestamp,
+    "message": String,
+    "validationWindow": Number,
+    "messageSignature": true
+  }
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>404</code>: when there is no pending validation for the <code>address</code></td>
+      <td>
+      <pre>
+{
+  error: {
+    message: String,
+    code: String,
+    cause?: {
+      message: String,
+    } 
+  }
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>403</code>: when the <code>signature</code> is invalid</td>
+      <td>
+      <pre>
+{
+  error: {
+    message: String,
+    code: String,
+    cause?: {
+      message: String,
+    } 
+  }
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>GET /stars/hash:{hash}</code></td>
+      <td><code>200</code></td>
+      <td>
+      <pre>
+{
+  height: Number,
+  time: UnixTimestamp,
+  body: Any,
+  hash: String,
+  previousBlockHash: String,
+}
+      </pre>
+      </td>
+    </tr>
+    <tr>
+      <td><code>GET /stars/address:{address}</code></td>
+      <td><code>200</code></td>
+      <td>
+      <pre>
+[
+  {
+    height: Number,
+    time: UnixTimestamp,
+    body: Any,
+    hash: String,
+    previousBlockHash: String,
+  }?
+  ...
+]
       </pre>
       </td>
     </tr>
