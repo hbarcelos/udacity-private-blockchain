@@ -4,8 +4,8 @@ const { toUnixTimestamp, toDuration, plus } = require('../utils/date');
 const ValidationRequest = require('../mempool/validation-request');
 const wrapError = require('./wrap-error');
 
-const validationRequestWindow = Number(process.env.VALIDATION_REQUEST_WINDOW);
-const validationExpiration = Number(process.env.VALIDATION_EXPIRATION);
+const validationRequestWindow = Number(process.env.VALIDATION_REQUEST_WINDOW) || 300;
+const validationExpiration = Number(process.env.VALIDATION_EXPIRATION) || 1800;
 
 module.exports = Router()
   .post(
