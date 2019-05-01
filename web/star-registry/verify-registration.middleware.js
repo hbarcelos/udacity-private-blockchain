@@ -1,7 +1,7 @@
-const { verifyAddressRequest } = require('../mempool');
-const wrapError = require('./wrap-error');
+const { verifyAddressRequest } = require('../../mempool');
+const wrapError = require('../wrap-error');
 
-const verifyStarRegistration = wrapError(async (req, res, next) => {
+async function verifyStarRegistration(req, res, next) {
   const currentDate = new Date();
 
   const { address, star } = req.body;
@@ -12,6 +12,6 @@ const verifyStarRegistration = wrapError(async (req, res, next) => {
 
   await verifyAddressRequest({ address, verifiedAt: currentDate });
   return next();
-});
+}
 
-module.exports = verifyStarRegistration;
+module.exports = wrapError(verifyStarRegistration);
