@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(starRegistryRouter);
 app.use('/block', blockRouter);
-app.use('/star', starRouter);
+app.use('/stars', starRouter);
 app.use(errorMiddleware);
 
 module.exports = app;
