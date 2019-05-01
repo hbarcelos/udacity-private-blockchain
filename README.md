@@ -4,7 +4,8 @@ This is my implentation of Udacity&rsquo;s Blockchain Developer Nanodegree Priva
 
 ## Prerequisites
 
-This project uses [`yarn`](https://yarnpkg.com/lang/en/docs/install) as package manager.
+- [`yarn`](https://yarnpkg.com/lang/en/docs/install): >=1.15.2.
+- `node`: >=8.9.4 <12.0.0.
 
 ## Install dependencies
 
@@ -25,10 +26,10 @@ yarn test
 Before running the web server, you need to create a `.env` file in the root of the project.
 
 ```
-cp sample.env .env
+cp .env.example .env 
 ```
 
-Set the desired values for the environment variables in the `.env` file:
+Set the desired values for the environment variables in the `.env` file, for example:
 
 ```bash
 PORT=8000
