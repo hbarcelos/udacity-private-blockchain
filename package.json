@@ -13,6 +13,10 @@
     "test": "cross-env BLOCKCHAIN_DATA_STORAGE_DIRECTORY=chaindata-test VALIDATION_REQUEST_WINDOW=300 VALIDATION_EXPIRATION=1800 jest",
     "test:watch": "nodemon -w *.js --exec npm test"
   },
+  "engines": {
+    "node": ">=8.4.0 <12.0.0"
+  },
+  "engineStrict": true,
   "dependencies": {
     "bitcoinjs-lib": "^4.0.5",
     "bitcoinjs-message": "^2.0.0",
