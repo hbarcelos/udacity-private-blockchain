@@ -5,12 +5,11 @@
   "license": "MIT",
   "scripts": {
     "clean": "shx rm -rf chaindata",
-    "start": "node -r dotenv-safe/config index.js",
+    "start": "node -r dotenv/config index.js",
     "start:watch": "nodemon --exec 'npm start' -w '**/*.js'",
     "lint": "npm run eslint .",
     "lint:fix": "npm run eslint . --fix",
     "pretest": "shx rm -rf chaindata-test",
-    "postinstall": "shx test -f ./.env || shx cp ./.env.example .env",
     "test": "cross-env BLOCKCHAIN_DATA_STORAGE_DIRECTORY=chaindata-test VALIDATION_REQUEST_WINDOW=300 VALIDATION_EXPIRATION=1800 jest",
     "test:watch": "nodemon -w *.js --exec npm test"
   },
@@ -20,7 +19,6 @@
     "body-parser": "^1.18.3",
     "crypto-js": "^3.1.9-1",
     "dotenv": "^7.0.0",
-    "dotenv-safe": "^6.1.0",
     "express": "^4.16.4",
     "level": "^4.0.0",
     "luxon": "^1.12.1"
