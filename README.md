@@ -4,13 +4,12 @@ This is my implentation of Udacity&rsquo;s Blockchain Developer Nanodegree Priva
 
 ## Prerequisites
 
-- [`yarn`](https://yarnpkg.com/lang/en/docs/install): >=1.15.2.
 - `node`: >=8.9.4 <12.0.0.
 
 ## Install dependencies
 
 ```
-yarn install
+npm install
 ```
 
 ## Testing
@@ -18,16 +17,10 @@ yarn install
 This project as a full test suite implementing all validation described in the probject&rsquo; rubric. To run it:
 
 ```
-yarn test
+npm test
 ```
 
 ## Running
-
-Before running the web server, you need to create a `.env` file in the root of the project.
-
-```
-cp .env.example .env 
-```
 
 Set the desired values for the environment variables in the `.env` file, for example:
 
@@ -41,7 +34,7 @@ VALIDATION_EXPIRATION=1800
 Now you can start the server:
 
 ```bash
-yarn start
+npm start
 ```
 
 ## Endpoints
